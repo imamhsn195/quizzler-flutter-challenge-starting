@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'quizBrain.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+import 'quiz_brain.dart';
+
 QuizBrain quizBrain = QuizBrain();
+
 void main() => runApp(Quizzler());
 
 class Quizzler extends StatelessWidget {
@@ -27,6 +30,29 @@ class QuizPage extends StatefulWidget {
 
 class _QuizPageState extends State<QuizPage> {
   List<Icon> scoreKeeper = [];
+
+  void checkAnswer(bool userPickedAnswer) {
+    bool correctAnswer = quizBrain.getCorrectAnswer();
+    setState(() {
+      if(quizBrain.isFinished()){
+        Alert(context: context, title: "Finished", desc: "Congrats you have finished the questions!.").show();
+      }
+      scoreKeeper = [];
+      if (userPickedAnswer == correctAnswer) {
+        scoreKeeper.add(Icon(
+          Icons.check,
+          color: Colors.green,
+        ));
+      } else {
+        scoreKeeper.add(Icon(
+          Icons.close,
+          color: Colors.red,
+        ));
+      }
+      quizBrain.nextQuestion();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -63,16 +89,8 @@ class _QuizPageState extends State<QuizPage> {
                 ),
               ),
               onPressed: () {
-                bool correctAnswer = quizBrain.getQuestionAnswer();
-                setState(() {
-                  if(quizBrain.nextQuestion()){
-                    if(correctAnswer == true){
-                      scoreKeeper.add(Icon(Icons.check, color: Colors.green,));
-                    }else{
-                      scoreKeeper.add(Icon(Icons.close, color: Colors.red,));
-                    }
-                  }
-                });
+                //The user picked true.
+                checkAnswer(true);
               },
             ),
           ),
@@ -90,21 +108,12 @@ class _QuizPageState extends State<QuizPage> {
                 ),
               ),
               onPressed: () {
-                bool correctAnswer = quizBrain.getQuestionAnswer();
-                setState(() {
-                  if(quizBrain.nextQuestion()){
-                    if(correctAnswer == false){
-                      scoreKeeper.add(Icon(Icons.close, color: Colors.red,));
-                    }else{
-                      scoreKeeper.add(Icon(Icons.check, color: Colors.green,));
-                    }
-                  }
-                });
+                //The user picked false.
+                checkAnswer(false);
               },
             ),
           ),
         ),
-        //TODO: Add a Row here as your score keeper
         Row(
           children: scoreKeeper,
         )
